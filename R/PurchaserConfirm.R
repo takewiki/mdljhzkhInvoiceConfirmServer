@@ -13,28 +13,19 @@
 #' PurchaserConfirmViewServer()
 PurchaserConfirmViewServer <- function(input,output,session,dms_token) {
   #获取参数
-  text_PurchaserConfirm_FBillNO = tsui::var_text('text_PurchaserConfirm_FBillNO')
-  text_PurchaserConfirm_checknote = tsui::var_file('text_PurchaserConfirm_checknote')
+
 
   shiny::observeEvent(input$btn_PurchaserConfirm_view,{
 
-    FBILLNO=text_PurchaserConfirm_FBillNO()
+    data = mdljhzkhInvoiceConfirmPkg::PurchaserConfirm_view(dms_token =dms_token)
 
-    if(FBILLNO==''  ){
+    tsui::run_dataTable2(id ='PurchaserConfirm_resultView' ,data = data)
 
-      tsui::pop_notice("请填写对账单号")
-
-
-    }else{
-
-      data = mdljhzkhInvoiceConfirmPkg::PurchaserConfirm_view(dms_token =dms_token ,FBILLNO = FBILLNO)
-
-      tsui::run_dataTable2(id ='PurchaserConfirm_resultView' ,data = data)
-
-      tsui::run_download_xlsx(id = 'dl_PurchaserConfirm',data =data ,filename ='对账单.xlsx' )
+    tsui::run_download_xlsx(id = 'dl_PurchaserConfirm',data =data ,filename ='对账单.xlsx' )
 
 
-    }
+
+
 
 
   })
@@ -58,7 +49,6 @@ PurchaserConfirmViewServer <- function(input,output,session,dms_token) {
 #' PurchaserConfirmUpdateServer()
 PurchaserConfirmUpdateServer <- function(input,output,session,dms_token) {
   #获取参数
-  text_PurchaserConfirm_FBillNO = tsui::var_text('text_PurchaserConfirm_FBillNO')
   text_PurchaserConfirm_checknote = tsui::var_file('text_PurchaserConfirm_checknote')
 
   shiny::observeEvent(input$btn_PurchaserConfirm_checknote_update,{
@@ -72,21 +62,20 @@ PurchaserConfirmUpdateServer <- function(input,output,session,dms_token) {
 
     }else{
 
-      data <- readxl::read_excel(filename,col_types = c("text","text", "text", "text",
-                                                        "text","text","text","numeric", "numeric",
-                                                        "text","numeric","numeric","numeric", "numeric",
-                                                        "text","numeric","text","text", "text","numeric"
+      data <- readxl::read_excel(filename,col_types = c("numeric","text","date","date","numeric","numeric","text",
+                                                        "numeric","numeric","numeric","text","numeric","text","text","text","text",
+                                                        "text","text","text","text","numeric","date","text","numeric"
+
 
                                                         ))
 
       data = as.data.frame(data)
       data = tsdo::na_standard(data)
 
-      tsda::db_writeTable2(token = dms_token,table_name = 'rds_zkh_src_t_reconciliation_po_input',r_object = data,append = TRUE)
+      tsda::db_writeTable2(token = dms_token,table_name = 'rds_zkh_src_t_pur_checkNote_ByPOEntry_input',r_object = data,append = TRUE)
 
 
       mdljhzkhInvoiceConfirmPkg::PurchaserConfirm_update(dms_token = dms_token)
-      mdljhzkhInvoiceConfirmPkg::PurchaserConfirm_delete(dms_token = dms_token)
       tsui::pop_notice("更新成功")
 
 

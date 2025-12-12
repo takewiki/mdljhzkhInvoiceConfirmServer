@@ -13,27 +13,22 @@
 #' ManagerConfirmViewServer()
 ManagerConfirmViewServer <- function(input,output,session,dms_token) {
   #获取参数
-  text_ManagerConfirm_FBillNO = tsui::var_text('text_ManagerConfirm_FBillNO')
 
   shiny::observeEvent(input$btn_ManagerConfirm_view,{
 
-    FBILLNO=text_ManagerConfirm_FBillNO()
 
-    if(FBILLNO==''  ){
+    data = mdljhzkhInvoiceConfirmPkg::ManagerConfirm_view(dms_token =dms_token )
 
-      tsui::pop_notice("请填写对账单号")
+    tsui::run_dataTable2(id ='ManagerConfirm_resultView' ,data = data)
 
-
-    }else{
-
-      data = mdljhzkhInvoiceConfirmPkg::PurchaserConfirm_view(dms_token =dms_token ,FBILLNO = FBILLNO)
-
-      tsui::run_dataTable2(id ='ManagerConfirm_resultView' ,data = data)
-
-      tsui::run_download_xlsx(id = 'dl_ManagerConfirm',data =data ,filename ='对账单.xlsx' )
+    tsui::run_download_xlsx(id = 'dl_ManagerConfirm',data =data ,filename ='对账单.xlsx' )
 
 
-    }
+
+
+
+
+
 
 
   })
@@ -63,13 +58,30 @@ ManagerConfirmUpdateServer <- function(input,output,session,dms_token) {
 
     FBILLNO=text_ManagerConfirm_FBillNO()
 
+
+
+
+
+
+
     if(FBILLNO==''  || is.null(FBILLNO)){
 
       tsui::pop_notice("请填写对账单号")
 
 
     }else{
+
+      data_id = mdljhzkhInvoiceConfirmPkg::ManagerConfirm_id(dms_token = dms_token,statementNo =FBILLNO )
+
+
+      id <- as.character(data_id)
+
+
       mdljhzkhInvoiceConfirmr::ChecknoteConfirm(statementNo =FBILLNO )
+      mdljhzkhInvoiceConfirmr::ChecknoteInvoice(statementNo = FBILLNO)
+      mdljhzkhInvoiceConfirmr::ChecknotedeleteMessage(statementID =id)
+      mdljhzkhInvoiceConfirmPkg::ManagerConfirm_isdo(dms_token = dms_token,statementNo = FBILLNO)
+
       tsui::pop_notice("确认完成")
 
 
