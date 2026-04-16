@@ -77,9 +77,14 @@ ManagerConfirmUpdateServer <- function(input,output,session,dms_token) {
       id <- as.character(data_id)
 
 
-      mdljhzkhInvoiceConfirmr::ChecknoteConfirm(statementNo =FBILLNO )
-      mdljhzkhInvoiceConfirmr::ChecknoteInvoice(statementNo = FBILLNO)
-      mdljhzkhInvoiceConfirmr::ChecknotedeleteMessage(statementID =id)
+      data =mdljhzkhInvoiceConfirmr::ChecknoteConfirm(statementNo =FBILLNO )
+      tsui::pop_notice(data)
+
+      data1 = mdljhzkhInvoiceConfirmr::ChecknoteInvoice(statementNo = FBILLNO)
+      tsui::pop_notice(data1)
+      data2 = mdljhzkhInvoiceConfirmr::ChecknotedeleteMessage(statementID =id)
+      tsui::pop_notice(data2)
+
       mdljhzkhInvoiceConfirmPkg::ManagerConfirm_isdo(dms_token = dms_token,statementNo = FBILLNO)
 
       tsui::pop_notice("确认完成")
